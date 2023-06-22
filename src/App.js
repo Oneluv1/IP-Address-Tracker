@@ -98,7 +98,7 @@ function App() {
                 </article>
 
                 <article className="lg:border-r lg:border-slate-400 p-6">
-                  <h2 className="text-sm uppercase text-slate-600">Location
+                  <h2 className="text-sm uppercase text-slate-600">Location</h2>
                 </article>
 
                 <article className="lg:border-r lg:border-slate-400 p-6">
