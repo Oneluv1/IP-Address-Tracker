@@ -1,28 +1,25 @@
 import { useState, useEffect } from 'react'
-import { MapContainer, TileLayer } from 'react-leaflet'
 import "leaflet/dist/leaflet.css"
+import { MapContainer, TileLayer } from 'react-leaflet'
+import Markerposition from "./Markerposition"
 import arrow from "./images/icon-arrow.svg"
 import background from "./images/pattern-bg-desktop.png"
-import Markerposition from "./Markerposition"
 
-import './App.css';
 
 function App() {
-  const [address, setAddress] = useState(null)
-  const [ipAddress, setIpAddress] = useState("")
-  const checkIpAddress =
-    /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi
-  const checkDomain =
-    /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/
+  const [address, setAddress] = useState(null);
+  const [ipAddress, setIpAddress] = useState("");
+
+  const checkIpAddress = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi
+  const checkDomain = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/
 
   useEffect(() => {
     try {
       const getInitialData = async () => {
         const res = await fetch(
-          'https://geo.ipify.org/api/v2/country,city?apiKey=at_WC5pk1PeBYP5lbFaQtNu4cGTyiM4m&ipAddress=8.8.8.8'
+          'https://geo.ipify.org/api/v2/country,city?apiKey=at_WC5pk1PeBYP5lbFaQtNu4cGTyiM4m&ipAddress=41.184.188.0'
         )
         const data = await res.json()
-        console.log(data)
         setAddress(data)
       }
 
@@ -32,21 +29,29 @@ function App() {
     }
   }, [])
 
-  async function getEnteredAddress (){
+   const getEnteredAddress = async () => {
     const res = await fetch(
-      `https://geo.ipify.org/api/v2/country,city?apiKey=${process.env.REACT_APP_API_KEY}&${checkIpAddress.test(ipAddress) ? `ipAddress=${ipAddress}` : checkDomain.test(ipAddress) ? `domain=${ipAddress}` : ""}`
-      // https://geo.ipify.org/api/v2/country,city?apiKey=${API_KEY}&ipAddress=8.8.8.8&domain=google.com
+      `https://geo.ipify.org/api/v2/country,city?apiKey=${
+        process.env.REACT_APP_API_KEY
+      }&${
+        checkIpAddress.test(ipAddress) 
+         ? `ipAddress=${ipAddress}` 
+         : checkDomain.test(ipAddress)
+         ? `domain=${ipAddress}` 
+         : ""
+        }`
+      
     )
     const data = await res.json()
     setAddress(data)
   }
 
-  function handleSubmit (e) {
+  const handleSubmit = (e) => {
     e.preventDefault()
     getEnteredAddress()
     setIpAddress("")
   }
-
+  console.log(address)
   return (
     <>
       <section>
@@ -79,14 +84,12 @@ function App() {
           </form>
         </div>
 
-        {address && (
+        {address && 
           <>
             <article className="p-8">
               <div
                 className="bg-white rounded-xl p-8 shadow max-w-6xl mx-auto grid grid-cols-1 gap-5 text-center md:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:text-left -mb-10 relative lg:-mb-32"
-                style={{
-                  zIndex: 10000,
-                }}
+                style={{zIndex: 10000}}
               >
                 <article className="lg:border-r lg:border-slate-400 p-6">
                   <h2 className="text-sm uppercase text-slate-600">
@@ -98,13 +101,15 @@ function App() {
                 </article>
 
                 <article className="lg:border-r lg:border-slate-400 p-6">
-                  <h2 className="text-sm uppercase text-slate-600">Location</h2>
-                </article>
+                  <h2 className="text-sm uppercase text-slate-600">Location </h2>
+                  <p className="font-bold text-slate-900 text-2xl">
+                  {address.location.city}, {address.location.region} </p>
+                </article> 
 
                 <article className="lg:border-r lg:border-slate-400 p-6">
                   <h2 className="text-sm uppercase text-slate-600">Timezone</h2>
                   <p className="font-bold text-slate-900 text-2xl">
-                    UTC 
+                    UTC {address.location.timezone}
                   </p>
                 </article>
 
@@ -130,7 +135,7 @@ function App() {
               <Markerposition address={address} />
             </MapContainer>
           </>
-        )}
+        }
       </section>
     </>
   )
